@@ -85,7 +85,7 @@ def scrap_data():
 # Schedule times
 schedule.every().day.at("10:38").do(scrap_data)
 schedule.every().day.at("11:30").do(scrap_data)
-schedule.every().day.at("17:00").do(scrap_data)
+schedule.every().day.at("18:18").do(scrap_data)
 schedule.every().day.at("23:00").do(scrap_data)
 
 # Run the scheduler
