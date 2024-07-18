@@ -4,7 +4,17 @@ import pandas as pd
 import datetime
 import schedule
 import time
+import random
 
+# Creating time lists
+morning_peak = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30"]
+inter_peak = ["11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"]
+evening_peak = ["17:00", "17:30", "18:00", "18:30", "19:00", "19:30"]
+off_peak = ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30",
+            "07:00", "07:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"]
+# Function to pick a random time from a given list
+def random_time(time_list):
+    return random.choice(time_list)
 
 # Function to extract traffic data
 def scrap_data():
@@ -86,12 +96,17 @@ def scrap_data():
     # Close the browser
     driver.quit()
 
-
 # Schedule times
-schedule.every().day.at("10:38").do(scrap_data)
-schedule.every().day.at("11:30").do(scrap_data)
-schedule.every().day.at("19:30").do(scrap_data)
-schedule.every().day.at("23:00").do(scrap_data)
+morning_time = random_time(morning_peak)
+inter_time = random_time(inter_peak)
+evening_time = random_time(evening_peak)
+off_time = random_time(off_peak)
+
+schedule.every().day.at(morning_time).do(scrap_data)
+schedule.every().day.at(inter_time).do(scrap_data)
+schedule.every().day.at(evening_time).do(scrap_data)
+schedule.every().day.at(off_time).do(scrap_data)
+print(f"Execution scheduled at: {morning_time}, {inter_time}, {evening_time}, {off_time}")
 
 # Run the scheduler
 while True:
