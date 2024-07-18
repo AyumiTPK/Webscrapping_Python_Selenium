@@ -30,18 +30,14 @@ def scrap_data():
 
     # Retrieve junction data
     junction_numbers = driver.find_elements(By.CSS_SELECTOR, 'span.tr-junction-number')
-    left_speeds = driver.find_elements(By.CSS_SELECTOR, 'div.tr-junction-section-content-left > span')
-    left_comments = driver.find_elements(By.CSS_SELECTOR,
-                                         'div.tr-junction-section-content-left > div.tr-junction-section-link > div.tr-junction-section-event > a > span.event-name')
-    right_speeds = driver.find_elements(By.CSS_SELECTOR, 'div.tr-junction-section-content-right > span')
-    right_comments = driver.find_elements(By.CSS_SELECTOR,
-                                          'div.tr-junction-section-content-right > div.tr-junction-section-link > div.tr-junction-section-event > a > span.event-name')
+    left_sections = driver.find_elements(By.CSS_SELECTOR, 'div.tr-junction-section-content-left')
+    right_sections = driver.find_elements(By.CSS_SELECTOR, 'div.tr-junction-section-content-right')
 
     # Prepare data into a list of dictionaries
     data = []
     for i in range(len(junction_numbers)):
         current_junction = junction_numbers[i].text.strip()
-        if current_junction == "J1":
+        if current_junction == 'J1':
             continue
 
         next_index = i + 1
@@ -51,10 +47,19 @@ def scrap_data():
         else:
             junction = current_junction
 
-        left_speed = left_speeds[i].text.strip() if i < len(left_speeds) else "No speed"
-        left_comment = left_comments[i].text.strip() if i < len(left_comments) else "No comment"
-        right_speed = right_speeds[i].text.strip() if i < len(right_speeds) else "No speed"
-        right_comment = right_comments[i].text.strip() if i < len(right_comments) else "No comment"
+        left_speed = left_sections[i].find_element(By.CSS_SELECTOR, 'span').text.strip() if i < len(
+            left_sections) else "No speed"
+        left_comments = left_sections[i].find_elements(By.CSS_SELECTOR,
+                                                       'div.tr-junction-section-link > div.tr-junction-section-event > a > span.event-name')
+        left_comments_text = [comment.text.strip() for comment in left_comments]
+        left_comment = ', '.join(left_comments_text) if left_comments_text else "No comment"
+
+        right_speed = right_sections[i].find_element(By.CSS_SELECTOR, 'span').text.strip() if i < len(
+            right_sections) else "No speed"
+        right_comments = right_sections[i].find_elements(By.CSS_SELECTOR,
+                                                         'div.tr-junction-section-link > div.tr-junction-section-event > a > span.event-name')
+        right_comments_text = [comment.text.strip() for comment in right_comments]
+        right_comment = ', '.join(right_comments_text) if right_comments_text else "No comment"
 
         current_datetime = datetime.datetime.now()  # Get the current date and time
         current_date = current_datetime.strftime("%Y-%m-%d")
