@@ -9,46 +9,45 @@ import schedule
 import time
 
 
-# Initialize Chrome WebDriver
 driver = webdriver.Chrome()
 driver.get('https://www.trafficengland.com/traffic-report')
 driver.implicitly_wait(10)
 
-# Find the motorway dropdown and select a motorway
+#Selecting a motorway from dropdown
 motorway_dropdown = driver.find_element(By.CSS_SELECTOR, '.tr-menu-motorway')
-motorway_dropdown.click()  # Click to expand the dropdown (if not expanded by default)
-
-# Select a motorway option (e.g., M1)
+motorway_dropdown.click()
 motorway_options = driver.find_elements(By.CSS_SELECTOR, '.tr-menu-motorway option')
 for option in motorway_options:
     if option.text == 'M1':
         option.click()
         break
 
-# Click the search button
+#Clicking the search button
 search_button = driver.find_element(By.CLASS_NAME, "tr-menu-motorway-search")
 search_button.click()
 
-# Retrieve junction data
+#Scrapping data
 driver.implicitly_wait(10)
 junction_numbers = driver.find_elements(By.CSS_SELECTOR, 'span.tr-junction-number')
 left_sections = driver.find_elements(By.CSS_SELECTOR, 'div.tr-junction-section-content-left')
 right_sections = driver.find_elements(By.CSS_SELECTOR, 'div.tr-junction-section-content-right')
 
-# Prepare data into a list of dictionaries
+#Extracting data a list
 data = []
 for i in range(len(junction_numbers)):
+    #Extracting junction numbers
     current_junction = junction_numbers[i].text.strip()
-    if current_junction == "J1":
+    if current_junction == 'J1':  #Ignoring J1 as there is no speed data
         continue
-
+    #Joining junction names (e.g. J48-J47)
     next_index = i + 1
     if next_index < len(junction_numbers):
         next_junction = junction_numbers[next_index].text.strip()
         junction = f"{current_junction}-{next_junction}"
     else:
         junction = current_junction
-
+    #Extracting speed and event names on both directions
+    #Joining event comments as some motorways have multiple events
     left_speed = left_sections[i].find_element(By.CSS_SELECTOR, 'span').text.strip() if i < len(
         left_sections) else "No speed"
     left_comments = left_sections[i].find_elements(By.CSS_SELECTOR,
@@ -62,8 +61,8 @@ for i in range(len(junction_numbers)):
                                                      'div.tr-junction-section-link > div.tr-junction-section-event > a > span.event-name')
     right_comments_text = [comment.text.strip() for comment in right_comments]
     right_comment = ', '.join(right_comments_text) if right_comments_text else "No comment"
-
-    current_datetime = datetime.datetime.now()  # Get the current date and time
+    #Adding date, time, day of the week for easier processing
+    current_datetime = datetime.datetime.now()
     current_date = current_datetime.strftime("%Y-%m-%d")
     current_time = current_datetime.strftime("%H:%M:%S")
     day_of_week = current_datetime.strftime("%A")
@@ -79,12 +78,14 @@ for i in range(len(junction_numbers)):
         "Day of Week": day_of_week
     })
 
-
-# Create a DataFrame from the data and display it
+#Saving the data into a file
 df = pd.DataFrame(data)
 timestamp = current_datetime.strftime("%Y%m%d_%H%M%S")
 csv_filename = f"{timestamp}.csv"
 df.to_csv(csv_filename, index=False)
 
-# Close the browser
+#Quitting the driver
 driver.quit()
+
+
+
