@@ -29,17 +29,17 @@ def scrap_data():
     driver.implicitly_wait(10)
 
     # Selecting a motorway from dropdown
-    motorway_dropdown = driver.find_element(By.CSS_SELECTOR, ".tr-menu-motorway")
-    motorway_dropdown.click()
-    motorway_options = driver.find_elements(By.CSS_SELECTOR, ".tr-menu-motorway option")
-    for option in motorway_options:
+    dropdown = driver.find_element(By.CSS_SELECTOR, ".tr-menu-motorway")
+    dropdown.click()
+    options = driver.find_elements(By.CSS_SELECTOR, ".tr-menu-motorway option")
+    for option in options:
         if option.text == "M1":
             option.click()
             break
 
     # Clicking the search button
-    search_button = driver.find_element(By.CLASS_NAME, "tr-menu-motorway-search")
-    search_button.click()
+    search = driver.find_element(By.CLASS_NAME, "tr-menu-motorway-search")
+    search.click()
 
     # Scrapping data
     driver.implicitly_wait(10)
@@ -48,7 +48,7 @@ def scrap_data():
     right_sections = driver.find_elements(By.CSS_SELECTOR, "div.tr-junction-section-content-right")
 
     # Extracting data a list
-    data = []
+    motorway_data = []
     for i in range(len(junction_numbers)):
         # Extracting junction numbers
         current_junction = junction_numbers[i].text.strip()
@@ -77,27 +77,26 @@ def scrap_data():
         right_comments_text = [comment.text.strip() for comment in right_comments]
         right_comment = ", ".join(right_comments_text) if right_comments_text else "No comment"
         # Adding date, time, day of the week for easier processing
-        current_datetime = datetime.datetime.now()
-        current_date = current_datetime.strftime("%Y-%m-%d")
-        current_time = current_datetime.strftime("%H:%M:%S")
-        day_of_week = current_datetime.strftime("%A")
+        date_time = datetime.datetime.now()
+        date = date_time.strftime("%Y-%m-%d")
+        time = date_time.strftime("%H:%M:%S")
+        day_of_week = date_time.strftime("%A")
 
-        data.append({
+        motorway_data.append({
             "Junction": junction,
             "Left Speed": left_speed,
             "Left Comment": left_comment,
             "Right Speed": right_speed,
             "Right Comment": right_comment,
-            "Date": current_date,
-            "Time": current_time,
+            "Date": date,
+            "Time": time,
             "Day of Week": day_of_week
         })
 
     # Saving the data into a file
-    df = pd.DataFrame(data)
-    timestamp = current_datetime.strftime("%Y%m%d_%H%M%S")
-    csv_filename = f"{timestamp}.csv"
-    df.to_csv(csv_filename, index=False)
+    df = pd.DataFrame(motorway_data)
+    filename = f"{date_time.strftime("%Y%m%d_%H%M%S")}.csv"
+    df.to_csv(filename, index=False)
 
     # Quitting the driver
     driver.quit()
@@ -106,21 +105,21 @@ def scrap_data():
 # Creating a function to reset daily schedule
 def setup_schedule():
     schedule.clear()
-    morning_time = random_time(morning_peak)
-    inter_time = random_time(inter_peak)
-    evening_time = random_time(evening_peak)
+    morning = random_time(morning_peak)
+    inter = random_time(inter_peak)
+    evening = random_time(evening_peak)
     off_time = random_time(off_peak)
 
-    schedule.every().day.at(morning_time).do(scrap_data)
-    schedule.every().day.at(inter_time).do(scrap_data)
-    schedule.every().day.at(evening_time).do(scrap_data)
+    schedule.every().day.at(morning).do(scrap_data)
+    schedule.every().day.at(inter).do(scrap_data)
+    schedule.every().day.at(evening).do(scrap_data)
     schedule.every().day.at(off_time).do(scrap_data)
-    print(f"Execution scheduled at: {morning_time}, {inter_time}, {evening_time}, {off_time}")
+    print(f"Execution scheduled at: {morning}, {inter}, {evening}, {off_time}")
 
 
-# Creating a function to check if midnnight
+# Creating a function to check for midnight
 def check_midnight():
-    if datetime.datetime.now().time() == datetime.time(0, 0):
+    if datetime.datetime.now().time().replace(microsecond=0) == datetime.time(0, 0):
         setup_schedule()
 
 
