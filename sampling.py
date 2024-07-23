@@ -119,8 +119,7 @@ def setup_schedule():
 
 # Creating a function to check for midnight
 def check_midnight():
-    if datetime.datetime.now().time().replace(microsecond=0) == datetime.time(0, 0):
-        setup_schedule()
+    schedule.every().day.at("23:59").do(setup_schedule)
 
 
 # Setting schedule once
@@ -130,4 +129,4 @@ setup_schedule()
 while True:
     check_midnight()
     schedule.run_pending()
-    time.sleep(1)
+    time.sleep(60)
