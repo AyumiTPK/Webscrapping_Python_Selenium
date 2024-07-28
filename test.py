@@ -82,13 +82,13 @@ for i in range(len(junction_numbers)):
 
     data.append({
         "Junction": junction,
-        "Left Speed": left_speed,
-        "Left Comment": left_comment,
-        "Right Speed": right_speed,
-        "Right Comment": right_comment,
+        "Left_Speed": left_speed,
+        "Left_Comment": left_comment,
+        "Right_Speed": right_speed,
+        "Right_Comment": right_comment,
         "Date": current_date,
         "Time": current_time,
-        "Day of Week": day_of_week,
+        "Day_of_Week": day_of_week,
         "Stratum": time_stratum
     })
 
