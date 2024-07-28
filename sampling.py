@@ -21,6 +21,18 @@ def random_time(time_list):
     return random.choice(time_list)
 
 
+# Creating a function to specify stratum for easier analysis
+def determine_stratum(time):
+    hour = int(time.split(':')[0])
+    if 7 <= hour < 10:
+        return "Morning"
+    elif 10 <= hour < 16:
+        return "Inter"
+    elif 16 <= hour < 19:
+        return "Evening"
+    else:
+        return "Off"
+
 # Creating a function to extract motorway data
 def scrap_data():
     # Accessing the website
@@ -78,24 +90,26 @@ def scrap_data():
         right_comment = ", ".join(right_comments_text) if right_comments_text else "No comment"
         # Adding date, time, day of the week for easier processing
         date_time = datetime.datetime.now()
-        date = date_time.strftime("%Y-%m-%d")
-        time = date_time.strftime("%H:%M:%S")
+        current_date = current_datetime.strftime("%Y-%m-%d")
+        current_time = current_datetime.strftime("%H:%M:%S")
         day_of_week = date_time.strftime("%A")
+        time_stratum = determine_stratum(current_time)
 
         motorway_data.append({
             "Junction": junction,
-            "Left Speed": left_speed,
-            "Left Comment": left_comment,
-            "Right Speed": right_speed,
-            "Right Comment": right_comment,
-            "Date": date,
-            "Time": time,
-            "Day of Week": day_of_week
+            "Left_Speed": left_speed,
+            "Left_Comment": left_comment,
+            "Right_Speed": right_speed,
+            "Right_Comment": right_comment,
+            "Date": current_date,
+            "Time": current_time,
+            "Day_of_Week": day_of_week,
+            "Stratum": time_stratum
         })
 
     # Saving the data into a file
     df = pd.DataFrame(motorway_data)
-    filename = f"{date_time.strftime("%Y%m%d_%H%M%S")}.csv"
+    filename = f"{date_time.strftime('%Y%m%d_%H%M%S')}.csv"
     df.to_csv(filename, index=False)
 
     # Quitting the driver

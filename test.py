@@ -8,6 +8,17 @@ import datetime
 import schedule
 import time
 
+# Creating a function to specify stratum for easier analysis
+def determine_stratum(time):
+    hour = int(time.split(':')[0])
+    if 7 <= hour < 10:
+        return "Morning"
+    elif 10 <= hour < 16:
+        return "Inter"
+    elif 16 <= hour < 19:
+        return "Evening"
+    else:
+        return "Off"
 
 driver = webdriver.Chrome()
 driver.get('https://www.trafficengland.com/traffic-report')
@@ -66,6 +77,8 @@ for i in range(len(junction_numbers)):
     current_date = current_datetime.strftime("%Y-%m-%d")
     current_time = current_datetime.strftime("%H:%M:%S")
     day_of_week = current_datetime.strftime("%A")
+    time_stratum = determine_stratum(current_time)
+
 
     data.append({
         "Junction": junction,
@@ -75,7 +88,8 @@ for i in range(len(junction_numbers)):
         "Right Comment": right_comment,
         "Date": current_date,
         "Time": current_time,
-        "Day of Week": day_of_week
+        "Day of Week": day_of_week,
+        "Stratum": time_stratum
     })
 
 #Saving the data into a file
