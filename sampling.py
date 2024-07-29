@@ -89,10 +89,10 @@ def scrap_data():
         right_comments_text = [comment.text.strip() for comment in right_comments]
         right_comment = ", ".join(right_comments_text) if right_comments_text else "No comment"
         # Adding date, time, day of the week for easier processing
-        date_time = datetime.datetime.now()
+        current_datetime = datetime.datetime.now()
         current_date = current_datetime.strftime("%Y-%m-%d")
         current_time = current_datetime.strftime("%H:%M:%S")
-        day_of_week = date_time.strftime("%A")
+        day_of_week = current_datetime.strftime("%A")
         time_stratum = determine_stratum(current_time)
 
         motorway_data.append({
@@ -109,7 +109,7 @@ def scrap_data():
 
     # Saving the data into a file
     df = pd.DataFrame(motorway_data)
-    filename = f"{date_time.strftime('%Y%m%d_%H%M%S')}.csv"
+    filename = f"{current_datetime.strftime('%Y%m%d_%H%M%S')}.csv"
     df.to_csv(filename, index=False)
 
     # Quitting the driver
